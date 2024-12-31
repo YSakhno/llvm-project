@@ -12,7 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: make build directory
-      run: mkdir --parents build
+      run: |
+        choco install git
+        mkdir --parents build
     - name: cmake
       run: |
         cd build
@@ -27,7 +29,7 @@ jobs:
           -DCMAKE_CXX_FLAGS="/MP" `
           -DLLVM_USE_CRT_MINSIZEREL="MT"
     - name: build
-      run: cd llvm-project-$env:LLVM_VER/build && cmake --build . --config RelWithDebInfo --target libclang
+      run: cd build && cmake --build . --config RelWithDebInfo --target libclang
     - name: create and print sha512sum
       run: |
         $env:Path = "C:\Program Files\Git\usr\bin;$env:Path"
