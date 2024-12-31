@@ -1,0 +1,43 @@
+name: libclang-windows-amd64
+
+on: [push]
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: make build directory
+      run: mkdir --parents build
+    - name: cmake
+      run: |
+        cd build
+        cmake ../llvm `
+          -Thost=x64 `
+          -DLLVM_ENABLE_PROJECTS=clang `
+          -DBUILD_SHARED_LIBS=OFF `
+          -DLLVM_ENABLE_ZLIB=OFF `
+          -DLLVM_ENABLE_ZSTD=OFF `
+          -DLLVM_ENABLE_TERMINFO=OFF `
+          -DLLVM_TARGETS_TO_BUILD=X86 `
+          -DCMAKE_CXX_FLAGS="/MP" `
+          -DLLVM_USE_CRT_MINSIZEREL="MT"
+    - name: build
+      run: cd llvm-project-$env:LLVM_VER/build && cmake --build . --config RelWithDebInfo --target libclang
+    - name: create and print sha512sum
+      run: |
+        $env:Path = "C:\Program Files\Git\usr\bin;$env:Path"
+        cd build\RelWithDebInfo\bin
+        sha512sum.exe libclang.dll > libclang.dll.windows-amd64.sha512sum
+        echo "Checksum is: "
+        Get-Content -Path libclang.dll.windows-amd64.sha512sum
+        tar zcvf libclang.dll.windows-amd64.tar.gz libclang.dll libclang.dll.windows-amd64.sha512sum
+        sha512sum.exe libclang.dll.windows-amd64.tar.gz
+    - uses: actions/upload-artifact@v4
+      with:
+        name: libclang.dll.windows-amd64.tar.gz
+        path: build\RelWithDebInfo\bin\libclang.dll.windows-amd64.tar.gz
