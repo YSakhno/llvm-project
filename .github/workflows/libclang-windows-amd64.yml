@@ -1,6 +1,15 @@
 name: libclang-windows-amd64
 
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      git_tag:
+        description: 'Git tag to checkout'
+        required: true
+
+defaults:
+  run:
+    shell: bash
 
 concurrency:
   group: ${{ github.repository }}-${{ github.head_ref || github.sha }}-${{ github.workflow }}
@@ -11,9 +20,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.inputs.git_tag }}
     - name: make build directory
       run: |
-        #choco install git
         mkdir -p build
     - name: cmake
       run: |
