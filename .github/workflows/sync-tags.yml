@@ -1,0 +1,30 @@
+name: Sync Tags from Upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *' # This will run the action daily at midnight UTC; adjust as needed
+
+jobs:
+  sync-tags:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Git
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Add upstream remote
+      run: git remote add upstream https://github.com/llvm/llvm-project.git
+
+    - name: Fetch upstream tags
+      run: git fetch upstream --tags
+
+    - name: Push tags to origin
+      run: git push origin --tags
