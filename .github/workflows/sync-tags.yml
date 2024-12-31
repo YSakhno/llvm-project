@@ -28,4 +28,6 @@ jobs:
       run: git fetch upstream --tags
 
     - name: Push tags to origin
+      env:
+        GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
       run: git push origin --tags
