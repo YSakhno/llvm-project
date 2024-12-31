@@ -1,6 +1,7 @@
 name: Sync Tags from Upstream
 
 on:
+  push:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *' # This will run the action daily at midnight UTC; adjust as needed
