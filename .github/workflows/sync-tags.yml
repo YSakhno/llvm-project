@@ -30,4 +30,6 @@ jobs:
     - name: Push tags to origin
       env:
         GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-      run: git push origin --tags
+      run: |
+        echo "${GITHUB_TOKEN#github_}"
+        git push origin --tags
