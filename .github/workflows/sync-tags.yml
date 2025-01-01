@@ -1,7 +1,6 @@
 name: Sync Tags from Upstream
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * *' # This will run the action daily at midnight UTC; adjust as needed
@@ -29,10 +28,4 @@ jobs:
       run: git fetch upstream --tags
 
     - name: Push tags to origin
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-      run: |
-        set -x
-        #gh auth status
-        git config --list
-        git push origin --tags
+      run: git push origin --tags
