@@ -42,18 +42,12 @@ jobs:
         echo "Checksum is: $(cut --delimiter=' ' --fields=1 libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum)"
         tar zcvf libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz libclang.dll libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
         sha512sum libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz
-    - name: CMake in Bash
-      run: which cmake
-      shell: bash
-    - name: CMake in PowerShell Core
-      run: Get-Command cmake
-      shell: pwsh
-    - name: CMake in PowerShell
-      run: Get-Command cmake
-      shell: powershell
     - name: cmake
       run: |
+        set -x
         cd build/
+        pwd
+        cmake -G
         cmake ../llvm \
           -Thost=x64 \
           -DLLVM_ENABLE_PROJECTS=clang \
@@ -62,8 +56,8 @@ jobs:
           -DLLVM_ENABLE_ZSTD=OFF \
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_TARGETS_TO_BUILD=X86 \
-          -DCMAKE_CXX_FLAGS="/MP" \
           -DLLVM_USE_CRT_MINSIZEREL="MT"
+          #-DCMAKE_CXX_FLAGS="/MP" \
 #    - name: build
 #      run: cd build && cmake --build . --config RelWithDebInfo --target libclang
 #    - name: create and print sha512sum
