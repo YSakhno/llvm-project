@@ -42,6 +42,15 @@ jobs:
         echo "Checksum is: $(cut --delimiter=' ' --fields=1 libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum)"
         tar zcvf libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz libclang.dll libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
         sha512sum libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz
+    - name: CMake in Bash
+      run: which cmake
+      shell: bash
+    - name: CMake in PowerShell Core
+      run: Get-Command cmake
+      shell: pwsh
+    - name: CMake in PowerShell
+      run: Get-Command cmake
+      shell: powershell
     - name: cmake
       run: |
         cd build/
