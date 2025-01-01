@@ -24,8 +24,8 @@ jobs:
     - name: Add upstream remote
       run: git remote add upstream https://github.com/llvm/llvm-project.git
 
-#    - name: Fetch upstream tags
-#      run: git fetch upstream --tags
+    - name: Fetch upstream tags
+      run: git fetch upstream --tags
 
     - name: Push tags to origin
       env:
