@@ -25,30 +25,41 @@ jobs:
     - name: make build directory
       run: |
         mkdir -p build
-    - name: cmake
+        mkdir --parents build\RelWithDebInfo\bin
+    - name: test tools
       run: |
-        cd build
-        cmake ../llvm `
-          -Thost=x64 `
-          -DLLVM_ENABLE_PROJECTS=clang `
-          -DBUILD_SHARED_LIBS=OFF `
-          -DLLVM_ENABLE_ZLIB=OFF `
-          -DLLVM_ENABLE_ZSTD=OFF `
-          -DLLVM_ENABLE_TERMINFO=OFF `
-          -DLLVM_TARGETS_TO_BUILD=X86 `
-          -DCMAKE_CXX_FLAGS="/MP" `
-          -DLLVM_USE_CRT_MINSIZEREL="MT"
-    - name: build
-      run: cd build && cmake --build . --config RelWithDebInfo --target libclang
-    - name: create and print sha512sum
-      run: |
-        $env:Path = "C:\Program Files\Git\usr\bin;$env:Path"
+        echo "Current PATH is: $PATH"
+        #PATH="C:\Program Files\Git\usr\bin;$env:Path"
         cd build\RelWithDebInfo\bin
-        sha512sum.exe libclang.dll > libclang.dll.windows-amd64.sha512sum
-        echo "Checksum is: "
-        Get-Content -Path libclang.dll.windows-amd64.sha512sum
+        echo -n "1234" > libclang.dll
+        sha512sum libclang.dll > libclang.dll.windows-amd64.sha512sum
+        echo "Checksum is: $(cat libclang.dll.windows-amd64.sha512sum)"
         tar zcvf libclang.dll.windows-amd64.tar.gz libclang.dll libclang.dll.windows-amd64.sha512sum
-        sha512sum.exe libclang.dll.windows-amd64.tar.gz
+        sha512sum libclang.dll.windows-amd64.tar.gz
+#    - name: cmake
+#      run: |
+#        cd build
+#        cmake ../llvm `
+#          -Thost=x64 `
+#          -DLLVM_ENABLE_PROJECTS=clang `
+#          -DBUILD_SHARED_LIBS=OFF `
+#          -DLLVM_ENABLE_ZLIB=OFF `
+#          -DLLVM_ENABLE_ZSTD=OFF `
+#          -DLLVM_ENABLE_TERMINFO=OFF `
+#          -DLLVM_TARGETS_TO_BUILD=X86 `
+#          -DCMAKE_CXX_FLAGS="/MP" `
+#          -DLLVM_USE_CRT_MINSIZEREL="MT"
+#    - name: build
+#      run: cd build && cmake --build . --config RelWithDebInfo --target libclang
+#    - name: create and print sha512sum
+#      run: |
+#        $env:Path = "C:\Program Files\Git\usr\bin;$env:Path"
+#        cd build\RelWithDebInfo\bin
+#        sha512sum.exe libclang.dll > libclang.dll.windows-amd64.sha512sum
+#        echo "Checksum is: "
+#        Get-Content -Path libclang.dll.windows-amd64.sha512sum
+#        tar zcvf libclang.dll.windows-amd64.tar.gz libclang.dll libclang.dll.windows-amd64.sha512sum
+#        sha512sum.exe libclang.dll.windows-amd64.tar.gz
     - uses: actions/upload-artifact@v4
       with:
         name: libclang.dll.windows-amd64.tar.gz
