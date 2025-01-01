@@ -21,7 +21,8 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
-#      with:
+      with:
+        ref: llvmorg-19.1.6
 #        ref: ${{ github.event.inputs.git_tag }}
     - name: make build directory
       run: |
@@ -30,13 +31,17 @@ jobs:
     - name: test tools
       run: |
         set -x
-        echo "Current PATH is: $PATH"
-        cd build/RelWithDebInfo/bin
+        VERSION_SUFFIX=
+        if [[ -n "${{ github.event.inputs.git_tag }}" ]]; then
+            VERSION_SUFFIX="${{ github.event.inputs.git_tag }}"
+            VERSION_SUFFIX="${VERSION_SUFFIX#llvmorg-}"
+        fi
+        cd build/RelWithDebInfo/bin/
         echo -n "1234" > libclang.dll
-        sha512sum libclang.dll > libclang.dll.windows-amd64.sha512sum
-        echo "Checksum is: $(cat libclang.dll.windows-amd64.sha512sum)"
-        tar zcvf libclang.dll.windows-amd64.tar.gz libclang.dll libclang.dll.windows-amd64.sha512sum
-        sha512sum libclang.dll.windows-amd64.tar.gz
+        sha512sum libclang.dll > libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
+        echo "Checksum is: $(cut --delimiter=' ' --fields=1 libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum)"
+        tar zcvf libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz libclang.dll libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
+        sha512sum libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz
 #    - name: cmake
 #      run: |
 #        cd build
@@ -72,4 +77,4 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: libclang.dll.windows-amd64.tar.gz
-        path: build/RelWithDebInfo/bin/libclang.dll.windows-amd64.tar.gz
+        path: build/RelWithDebInfo/bin/libclang.dll.*.tar.gz
