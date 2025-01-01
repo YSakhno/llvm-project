@@ -24,29 +24,11 @@ jobs:
       with:
         ref: llvmorg-19.1.6
 #        ref: ${{ github.event.inputs.git_tag }}
-    - name: make build directory
+    - name: Setup the Build
       run: |
+        set -x
         mkdir --parents build
-        mkdir --parents build/RelWithDebInfo/bin
-    - name: test tools
-      run: |
-        set -x
-        VERSION_SUFFIX=
-        if [[ -n "${{ github.event.inputs.git_tag }}" ]]; then
-            VERSION_SUFFIX="${{ github.event.inputs.git_tag }}"
-            VERSION_SUFFIX="${VERSION_SUFFIX#llvmorg-}"
-        fi
-        cd build/RelWithDebInfo/bin/
-        echo -n "1234" > libclang.dll
-        sha512sum libclang.dll > libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
-        echo "Checksum is: $(cut --delimiter=' ' --fields=1 libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum)"
-        tar zcvf libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz libclang.dll libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
-        sha512sum libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz
-    - name: cmake
-      run: |
-        set -x
         cd build/
-        pwd
         cmake ../llvm \
           -G "Visual Studio 17 2022" \
           -A x64 \
@@ -58,27 +40,23 @@ jobs:
           -DLLVM_ENABLE_ZSTD=OFF \
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_TARGETS_TO_BUILD=X86 \
-          -DLLVM_USE_CRT_MINSIZEREL="MT"
-          #-DCMAKE_CXX_FLAGS="/MP" \
-#    - name: build
+          -DLLVM_USE_CRT_MINSIZEREL="MT" \
+          -DCMAKE_CXX_FLAGS="/MP" \
+#    - name: Build
 #      run: cd build && cmake --build . --config RelWithDebInfo --target libclang
-#    - name: create and print sha512sum
-#      run: |
-#        $env:Path = "C:\Program Files\Git\usr\bin;$env:Path"
-#        cd build\RelWithDebInfo\bin
-#        sha512sum.exe libclang.dll > libclang.dll.windows-amd64.sha512sum
-#        echo "Checksum is: "
-#        Get-Content -Path libclang.dll.windows-amd64.sha512sum
-#        tar zcvf libclang.dll.windows-amd64.tar.gz libclang.dll libclang.dll.windows-amd64.sha512sum
-#        sha512sum.exe libclang.dll.windows-amd64.tar.gz
-    - name: test files
+    - name: Prepare the built artifact
       run: |
-        set -x
-        echo "Current directory"
-        pwd
-        ls build/
-        ls build/RelWithDebInfo/
-        ls build/RelWithDebInfo/bin/
+        VERSION_SUFFIX=
+        if [[ -n "${{ github.event.inputs.git_tag }}" ]]; then
+            VERSION_SUFFIX="${{ github.event.inputs.git_tag }}"
+            VERSION_SUFFIX="${VERSION_SUFFIX#llvmorg-}"
+        fi
+        cd build/RelWithDebInfo/bin/
+        ls -lah
+        sha512sum libclang.dll > libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
+        echo "Checksum is: $(cut --delimiter=' ' --fields=1 libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum)"
+        tar zcvf libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz libclang.dll libclang.dll${VERSION_SUFFIX}.windows-amd64.sha512sum
+        sha512sum libclang.dll${VERSION_SUFFIX}.windows-amd64.tar.gz
     - uses: actions/upload-artifact@v4
       with:
         name: libclang.dll.windows-amd64.tar.gz
