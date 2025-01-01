@@ -26,9 +26,7 @@ jobs:
 #        ref: ${{ github.event.inputs.git_tag }}
     - name: Setup the Build
       run: |
-        set -x
-        mkdir --parents build
-        cd build/
+        mkdir --parents build && cd build/
         cmake ../llvm \
           -G "Visual Studio 17 2022" \
           -A x64 \
@@ -40,10 +38,9 @@ jobs:
           -DLLVM_ENABLE_ZSTD=OFF \
           -DLLVM_ENABLE_TERMINFO=OFF \
           -DLLVM_TARGETS_TO_BUILD=X86 \
-          -DLLVM_USE_CRT_MINSIZEREL="MT" \
-          -DCMAKE_CXX_FLAGS="/MP" \
-#    - name: Build
-#      run: cd build && cmake --build . --config RelWithDebInfo --target libclang
+          -DLLVM_USE_CRT_MINSIZEREL="MT"
+    - name: Build
+      run: cd build/ && cmake --build . --config RelWithDebInfo --parallel --target libclang
     - name: Prepare the built artifact
       run: |
         VERSION_SUFFIX=
