@@ -25,13 +25,13 @@ jobs:
 #        ref: ${{ github.event.inputs.git_tag }}
     - name: make build directory
       run: |
-        mkdir -p build
-        mkdir --parents build\RelWithDebInfo\bin
+        mkdir --parents build
+        mkdir --parents build/RelWithDebInfo/bin
     - name: test tools
       run: |
+        set -x
         echo "Current PATH is: $PATH"
-        #PATH="C:\Program Files\Git\usr\bin;$env:Path"
-        cd build\RelWithDebInfo\bin
+        cd build/RelWithDebInfo/bin
         echo -n "1234" > libclang.dll
         sha512sum libclang.dll > libclang.dll.windows-amd64.sha512sum
         echo "Checksum is: $(cat libclang.dll.windows-amd64.sha512sum)"
@@ -61,7 +61,15 @@ jobs:
 #        Get-Content -Path libclang.dll.windows-amd64.sha512sum
 #        tar zcvf libclang.dll.windows-amd64.tar.gz libclang.dll libclang.dll.windows-amd64.sha512sum
 #        sha512sum.exe libclang.dll.windows-amd64.tar.gz
+    - name: test files
+      run: |
+        set -x
+        echo "Current directory"
+        pwd
+        ls build/
+        ls build/RelWithDebInfo/
+        ls build/RelWithDebInfo/bin/
     - uses: actions/upload-artifact@v4
       with:
         name: libclang.dll.windows-amd64.tar.gz
-        path: build\RelWithDebInfo\bin\libclang.dll.windows-amd64.tar.gz
+        path: build/RelWithDebInfo/bin/libclang.dll.windows-amd64.tar.gz
