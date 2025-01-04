@@ -48,7 +48,7 @@ jobs:
             VERSION_SUFFIX="${{ github.event.inputs.git_tag }}"
             VERSION_SUFFIX="${VERSION_SUFFIX#llvmorg-}"
         fi
-        mkdir --parents build/stage/
+        mkdir --parents build/staging/
         cd build/
         cp Release/bin/libclang.* Release/lib/libclang.* staging/
         cd staging/
